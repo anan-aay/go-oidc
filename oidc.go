@@ -1,4 +1,5 @@
 // Package oidc implements OpenID Connect client logic for the golang.org/x/oauth2 package.
+// This is a fork to support HSDP IAM until such time it follows the standard
 package oidc
 
 import (
@@ -110,8 +111,11 @@ var supportedAlgorithms = map[string]bool{
 //
 // The issuer is the URL identifier for the service. For example: "https://accounts.google.com"
 // or "https://login.salesforce.com".
-func NewProvider(ctx context.Context, issuer string) (*Provider, error) {
+func NewProvider(ctx context.Context, issuer string, version ...string) (*Provider, error) {
 	wellKnown := strings.TrimSuffix(issuer, "/") + "/.well-known/openid-configuration"
+	if len(version) > 0 {
+		wellKnown = wellKnown + "?api-version=" + version[0]
+	}
 	req, err := http.NewRequest("GET", wellKnown, nil)
 	if err != nil {
 		return nil, err
