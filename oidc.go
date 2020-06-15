@@ -141,7 +141,7 @@ func NewProvider(ctx context.Context, issuer string, version ...string) (*Provid
 		return nil, fmt.Errorf("oidc: failed to decode provider discovery object: %v", err)
 	}
 	if len(version) > 1 {
-		issuer = issuer + "?api-version=" + version[1]
+		issuer = issuer + "/token?api-version=" + version[1]
 	}
 
 	if p.Issuer != issuer {
