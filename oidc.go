@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"mime"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -107,6 +108,18 @@ var supportedAlgorithms = map[string]bool{
 	PS512: true,
 }
 
+func (p providerJSON) IssuerEqualTo(k string) bool {
+	// If it's an URL only check the hostname, otherwise string compare
+	if u, err := url.Parse(k); err == nil {
+		v, err := url.Parse(p.Issuer)
+		if err != nil {
+			return k == p.Issuer
+		}
+		return u.Host == v.Host
+	}
+	return k == p.Issuer
+}
+
 // NewProvider uses the OpenID Connect discovery mechanism to construct a Provider.
 //
 // The issuer is the URL identifier for the service. For example: "https://accounts.google.com"
@@ -141,10 +154,10 @@ func NewProvider(ctx context.Context, issuer string, version ...string) (*Provid
 		return nil, fmt.Errorf("oidc: failed to decode provider discovery object: %v", err)
 	}
 	if len(version) > 1 {
-		issuer = issuer + "/token?api-version=" + version[1]
+		issuer = issuer + "?api-version=" + version[1]
 	}
 
-	if p.Issuer != issuer {
+	if !p.IssuerEqualTo(issuer) {
 		return nil, fmt.Errorf("oidc: issuer did not match the issuer returned by provider, expected %q got %q", issuer, p.Issuer)
 	}
 	var algs []string

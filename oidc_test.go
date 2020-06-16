@@ -297,3 +297,17 @@ func TestNewProvider(t *testing.T) {
 		})
 	}
 }
+
+func TestProviderJSON_IssuerEqualTo(t *testing.T) {
+	p := providerJSON{
+		Issuer: "https://foo.bar/baz/ban",
+	}
+
+	if !p.IssuerEqualTo("https://foo.bar/ban/bz") {
+		t.Errorf("IssuerEqualTo() should be equal based on hostname")
+	}
+	p.Issuer = "deadbeaf"
+	if !p.IssuerEqualTo("deadbeaf") {
+		t.Errorf("IssuerEqualTo() should be equal based non URL string")
+	}
+}
