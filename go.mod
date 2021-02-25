@@ -1,4 +1,4 @@
-module github.com/loafoe/go-oidc/v3
+module github.com/anan-aay/go-oidc
 
 go 1.14
 
